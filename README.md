@@ -1,2 +1,10 @@
 # IM1253B-Module-reader
-A (ROS) package for IM1253B current/power module UART codes.
+
+读取 IM1253B 电流/电压模块的代码。
+
+## 纯C++代码
+程序启动了一个线程，利用boost::asio发送数据。按照协议，只尝试获取前两个寄存器（电压与电流）的值，同时校验位是提前手动算好的，直接贴到后面。
+在main进程里面，不断读取数据，然后转化为电压与电流。
+
+## ROS节点代码
+TODO
