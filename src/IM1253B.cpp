@@ -41,18 +41,18 @@ void IM1253B::ask_voltage_current(void){
 
 // data: 01, 03, 08, xx,xx, yy,yy, CRC_low, CRC_high
 bool IM1253B::read_voltage_current(void){
-    unsigned char data[9];
+    unsigned char data[13];
     boost::asio::read(*sp_, boost::asio::buffer(data, 3));
     if(data[0] == 0x01 && data[1] == 0x03 && data[2] == 0x08){
         std::cout << "<-- data received. " << std::endl;
-        boost::asio::read(*sp_, boost::asio::buffer(&data[3], 6));  // read following 6 bytes
-        uint16_t crc = calculate_crc(data, 7);              // calculate 7 bytes CRC
-        if(crc != static_cast<uint16_t>(data[8] << 8 | data[7])){
+        boost::asio::read(*sp_, boost::asio::buffer(&data[3], 10));  // read following 10 bytes
+        uint16_t crc = calculate_crc(data, 11);              // calculate 11 bytes CRC
+        if(crc != static_cast<uint16_t>(data[12] << 8 | data[11])){
             std::cout << "CRC check failed. " << std::endl;
             return false;
         }
-        voltage_ = (data[3] << 8 | data[4]) * 1e-4;       // voltage: 0.0001V 
-        current_ = (data[5] << 8 | data[6]) * 1e-4;       // current: 0.0001A
+        voltage_ = (data[3] << 24 | data[4] << 16 | data[5] << 8 | data[6]) * 1e-4;     // voltage: 0.0001V 
+        current_ = (data[7] << 24 | data[8] << 16 | data[9] << 8 | data[10]) * 1e-4;    // current: 0.0001A
         // std::cout << "voltage: " << voltage_ <<"V, current: " << current_ << "A" << std::endl;
     }
     return true;
